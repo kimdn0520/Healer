@@ -14,26 +14,25 @@ public class Player_Run : State
 
     public override void Enter()
     {
-        
+        playerController.animator.SetBool("isRunning", true);
     }
 
     public override void FixedExecute()
     {
-        playerController.rigid2D.MovePosition(playerController.rigid2D.position + playerController.inputVec * playerController.moveSpeed * Time.fixedDeltaTime);
+        playerController.rigid2D.velocity = playerController.inputVec * playerController.moveSpeed;
+    }
 
+    public override void Execute()
+    {
         if (playerController.inputVec == Vector2.zero)
         {
             playerController.ChangeState(PlayerStates.Idle);
         }
     }
 
-    public override void Execute()
-    {
-        
-    }
-
     public override void Exit()
     {
-
+        // 빠져나갈때는 속도를 zero 해주면 미끄러지지 않는다.
+        playerController.rigid2D.velocity = Vector2.zero;
     }
 }

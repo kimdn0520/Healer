@@ -14,7 +14,7 @@ public class Player_Idle : State
 
     public override void Enter()
     {
-
+        playerController.animator.SetBool("isRunning", false);
     }
 
     public override void FixedExecute()
