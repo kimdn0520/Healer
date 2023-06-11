@@ -24,6 +24,15 @@ public class Player_Idle : State
 
     public override void Execute()
     {
+        playerController.isGrounded = playerController.CheckGround();
+
+        if (!playerController.isGrounded)
+        {
+            playerController.ChangeState(PlayerStates.Fall);
+
+            return;
+        }
+
         if (playerController.inputVec != Vector2.zero)
         {
             playerController.ChangeState(PlayerStates.Walk);

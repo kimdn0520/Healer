@@ -15,6 +15,8 @@ public class Player_Jump : State
     {
         playerController.animator.SetBool("Jump", true);
 
+        playerController.rigid2D.gravityScale = playerController.jumpGravityScale;
+
         playerController.rigid2D.AddForce(new Vector2(0f, playerController.jumpForce), ForceMode2D.Impulse);
     }
 
@@ -25,15 +27,14 @@ public class Player_Jump : State
 
     public override void Execute()
     {
-        // 점프 동작이 종료되면 Idle 상태로 전환
-        if (!playerController.animator.GetBool("Jump"))
+        if(playerController.rigid2D.velocity.y <= 0)
         {
-            playerController.ChangeState(PlayerStates.Idle);
+            playerController.ChangeState(PlayerStates.Fall);
         }
     }
 
     public override void Exit()
     {
-        
+        playerController.animator.SetBool("Jump", false);
     }
 }

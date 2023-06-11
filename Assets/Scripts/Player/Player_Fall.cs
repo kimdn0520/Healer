@@ -1,20 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-public class Player_Run : State
+public class Player_Fall : State
 {
     private PlayerController playerController;
 
-    public Player_Run(PlayerController _playerController)
+    public Player_Fall(PlayerController _playerController)
     {
         playerController = _playerController;
     }
 
     public override void Enter()
     {
-        playerController.animator.SetBool("isRunning", true);
+        playerController.animator.SetBool("Fall", true);
+
+        playerController.rigid2D.gravityScale = playerController.fallGravityScale;
     }
 
     public override void FixedExecute()
@@ -26,14 +27,7 @@ public class Player_Run : State
     {
         playerController.isGrounded = playerController.CheckGround();
 
-        if (!playerController.isGrounded)
-        {
-            playerController.ChangeState(PlayerStates.Fall);
-
-            return;
-        }
-
-        if (playerController.inputVec == Vector2.zero)
+        if (playerController.isGrounded)
         {
             playerController.ChangeState(PlayerStates.Idle);
         }
@@ -41,7 +35,8 @@ public class Player_Run : State
 
     public override void Exit()
     {
-        // 빠져나갈때는 속도를 zero 해주면 미끄러지지 않는다.
-        playerController.rigid2D.velocity = Vector2.zero;
+        playerController.animator.SetBool("Fall", false);
+
+        playerController.rigid2D.gravityScale = playerController.jumpGravityScale;
     }
 }
