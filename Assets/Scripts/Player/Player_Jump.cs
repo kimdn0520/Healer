@@ -15,7 +15,13 @@ public class Player_Jump : State
     {
         playerController.animator.SetBool("Jump", true);
 
+        playerController.isJumping = true;
+        
+        playerController.isGrounded = false;
+
         playerController.rigid2D.gravityScale = playerController.jumpGravityScale;
+
+        playerController.rigid2D.velocity = new Vector2(0, 0);
 
         playerController.rigid2D.AddForce(new Vector2(0f, playerController.jumpForce), ForceMode2D.Impulse);
     }
@@ -27,7 +33,9 @@ public class Player_Jump : State
 
     public override void Execute()
     {
-        if(playerController.rigid2D.velocity.y <= 0)
+        // 점프중일때는 isGrounded 체크를 해주지 않는다.
+
+        if (playerController.rigid2D.velocity.y <= 0)
         {
             playerController.ChangeState(PlayerStates.Fall);
         }
@@ -36,5 +44,9 @@ public class Player_Jump : State
     public override void Exit()
     {
         playerController.animator.SetBool("Jump", false);
+
+        playerController.isJumping = false;
+
+        playerController.prePlayerState = PlayerStates.Jump;
     }
 }

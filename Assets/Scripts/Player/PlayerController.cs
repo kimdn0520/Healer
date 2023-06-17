@@ -1,14 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public enum PlayerStates { Idle, Walk, Jump, Fall, Attack, die }
+public enum PlayerStates { Idle, Run, Jump, Fall, Attack, die }
 
 public class PlayerController : MonoBehaviour
 {
     private Dictionary<PlayerStates, State> states;
     private State currentState;
+    public PlayerStates prePlayerState;
 
     public Rigidbody2D rigid2D;
     public SpriteRenderer spriteRenderer;
@@ -20,15 +22,21 @@ public class PlayerController : MonoBehaviour
     public Vector2 inputVec;
     public float jumpGravityScale;
     public float fallGravityScale;
+    public bool isJumping;
+    [ReadOnly] public bool isCoyoteTime;
+    public float coyoteTimeDuration;
+    
     int groundLayerMask;
 
-    [SerializeField] float raycastGroundDistance;
+    [SerializeField] private Vector2 boxCastSize;
+    [SerializeField] private float boxCastMaxDistance;
+    [SerializeField] private Vector2 boxCenter;
 
     private void Awake()
     {
         // 변수 초기화
-        raycastGroundDistance = 0.7f;
         groundLayerMask = 1 << LayerMask.NameToLayer("Ground");
+        isCoyoteTime = false;
 
         // 컴포넌트 캐싱
         rigid2D = GetComponent<Rigidbody2D>();
@@ -38,12 +46,13 @@ public class PlayerController : MonoBehaviour
         // states에 상태 저장
         states = new Dictionary<PlayerStates, State>();
         states.Add(PlayerStates.Idle, new Player_Idle(this));
-        states.Add(PlayerStates.Walk, new Player_Run(this));
+        states.Add(PlayerStates.Run, new Player_Run(this));
         states.Add(PlayerStates.Jump, new Player_Jump(this));
         states.Add(PlayerStates.Fall, new Player_Fall(this));
 
         // 현재 State 설정
         currentState = states[PlayerStates.Idle];
+        prePlayerState = PlayerStates.Idle;
 
         // 최초 실행
         currentState.Enter();
@@ -85,17 +94,16 @@ public class PlayerController : MonoBehaviour
 
     public bool CheckGround()
     {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, raycastGroundDistance, groundLayerMask);
+        Vector2 origin = transform.position;
+
+        RaycastHit2D hit = Physics2D.BoxCast(origin - boxCenter, boxCastSize, 0f, Vector2.down, boxCastMaxDistance, groundLayerMask);
 
         return hit.collider != null;
     }
 
     void Action_Jump()
     {
-        // 점프 가능한 상태인지 확인하고 점프 실행
-        isGrounded = CheckGround();
-
-        if (CheckGround())
+        if (isGrounded || (isCoyoteTime && !isGrounded))
         {
             ChangeState(PlayerStates.Jump);
         }
@@ -133,6 +141,8 @@ public class PlayerController : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawRay(transform.position, Vector2.down * raycastGroundDistance);
+        Vector2 origin = transform.position;
+
+        Gizmos.DrawCube(origin - boxCenter, boxCastSize);
     }
 }

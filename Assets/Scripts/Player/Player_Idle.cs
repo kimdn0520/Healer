@@ -35,12 +35,12 @@ public class Player_Idle : State
 
         if (playerController.inputVec != Vector2.zero)
         {
-            playerController.ChangeState(PlayerStates.Walk);
+            playerController.ChangeState(PlayerStates.Run);
         }
     }
 
     public override void Exit()
     {
-
+        playerController.prePlayerState = PlayerStates.Idle;
     }
 }

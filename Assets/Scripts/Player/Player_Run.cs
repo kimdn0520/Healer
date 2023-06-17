@@ -43,5 +43,7 @@ public class Player_Run : State
     {
         // 빠져나갈때는 속도를 zero 해주면 미끄러지지 않는다.
         playerController.rigid2D.velocity = Vector2.zero;
+
+        playerController.prePlayerState = PlayerStates.Run;
     }
 }
