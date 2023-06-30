@@ -19,6 +19,8 @@ public class Player_Run : State
 
     public override void FixedExecute()
     {
+        // 가끔씩 안움직일때가 있어서 왜 그런지 몰랐는데 
+        // 타일맵 콜라이더가 분할 되있어서 끼는 문제였다. -> CompositeCollider2D를 추가하여 해결!
         playerController.rigid2D.velocity = new Vector2(playerController.inputVec.x * playerController.moveSpeed, playerController.rigid2D.velocity.y);
     }
 
